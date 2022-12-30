@@ -13,20 +13,21 @@ namespace Lights
 		LedStrip(uint numLeds);
 		~LedStrip();
 
-		uint NumLeds();
-		uint8_t Brightness();
-		void SetBrightness(uint8_t brightness);
+		uint NumLeds() { return numLeds; };
+		uint8_t Brightness() { return brightness; };
+		void SetBrightness(uint8_t brightnessValue) { brightness = brightnessValue; };
 		Colour PixelColour(uint index);
 		void SetPixelColour(uint index, Colour colour);
 		virtual void Show() = 0;
-		void Fill(Colour colour, uint first, uint count);
-		void Fill(Colour colour);
+		void ApplyGamma(bool gammaValue) { applyGamma = gammaValue; };
+		bool Gamma() { return applyGamma; };
 
 	protected:
 		uint32_t ScalePixelData(uint32_t data, uint16_t scale);
 
 		uint numLeds;
 		uint8_t brightness = 255;
+		bool applyGamma;
 
 		// The Colour data for the entire string of LEDs
 		Colour *pixelData;

@@ -7,8 +7,14 @@ namespace Lights
 	class ws2812Strip : public LedStrip
 	{
 	public:
-		ws2812Strip(PIO pioBlock, uint stateMachine, uint dataPin, uint numLeds, uint bitsPerPixel);
-		ws2812Strip(uint dataPin, uint numLeds, uint bitsPerPixel);
+		// Fixed frequency for Leds being used
+		const float Frequency = 800000;
+
+		// Leds are RGB i.e. 24 bits
+		const uint BitsPerPixel = 24;
+
+		ws2812Strip(PIO pioBlock, uint stateMachine, uint dataPin, uint numLeds);
+		ws2812Strip(uint dataPin, uint numLeds);
 		void Show();
 
 	private:
@@ -16,7 +22,6 @@ namespace Lights
 		PIO pioBlock;
 		uint stateMachine;
 		uint dataPin;
-		uint bitsPerPixel;
 		absolute_time_t nextWriteAllowedTime;
 
 		/// @brief The number of microseconds do allow the last set of data to be latched by the

@@ -2,7 +2,7 @@
 
 #include "pico/types.h"
 #include "LedStrip.hpp"
-#include "Animation.hpp"
+#include "AnimationHelper.hpp"
 #include <vector>
 
 namespace Lights
@@ -19,26 +19,30 @@ namespace Lights
 		static const int MaxColours = 3;
 
 		LedSegment(LedStrip *target, uint start, uint ledCount);
-		Colour PixelColour(uint index);
-		void SetPixelColour(uint index, Colour colour);
-		void Show();
-		uint NumLeds();
-		void SetAnimation(animationType animationFunction);
-		bool IsAnimated();
+		inline Colour PixelColour(uint index) { return targetStrip->PixelColour(index + startIndex); };
+		inline void SetPixelColour(uint index, Colour colour)
+		{
+			targetStrip->SetPixelColour(index + startIndex, colour);
+		};
+		inline void Show() { targetStrip->Show(); };
 		void Animate();
 		void Fill(Colour colour, uint first, uint count);
-		void Fill(Colour colour);
-		absolute_time_t NextTime();
+		void Fill(Colour colour) { Fill(colour, 0, numLeds); };
 		Colour GetColour(uint8_t index);
 		void SetColours(std::vector<Colour> colours);
-		uint StepCount();
-		void SetStepCount(uint stepCount);
-		uint Speed();
-		void SetSpeed(uint speed);
-		uint8_t AuxParam();
-		void SetAuxParam(uint8_t param);
-		uint CallCount();
-		void SetCallCount(uint callCount);
+		void SetAnimation(animationType animationFunction);
+
+		inline uint NumLeds() { return numLeds; };
+		inline bool IsAnimated() { return (animation != nullptr); };
+		inline absolute_time_t NextTime() { return nextTime; };
+		inline uint32_t StepCount() { return animationStepCount; };
+		inline void SetStepCount(uint32_t stepCount) { animationStepCount = stepCount; };
+		inline uint Speed() { return animationSpeed; };
+		inline void SetSpeed(uint speed) { animationSpeed = speed; };
+		inline uint8_t AuxParam() { return auxParam; };
+		inline void SetAuxParam(uint8_t param) { auxParam = param; };
+		inline uint CallCount() { return animationCallCount; };
+		inline void SetCallCount(uint callCount) { animationCallCount = callCount; };
 
 	private:
 		LedStrip *targetStrip;
@@ -55,7 +59,7 @@ namespace Lights
 		absolute_time_t nextTime = nil_time;
 
 		// A counter used by animations to keep track of where they are in an animation cycle
-		uint animationStepCount = 0;
+		uint32_t animationStepCount = 0;
 
 		// The interpretation of this depends on the actual animation being used
 		// For most it is how long a complete animation cycle should take

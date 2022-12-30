@@ -14,15 +14,16 @@ pico_sdk_init()
 
 add_executable(${PROJECT} 
 		ws2812.cpp 
-		Colour.hpp 
+		Colour.cpp 
 		LedStrip.cpp 
 		ws2812Strip.cpp 
 		LedSegment.cpp
 		LedController.cpp
 		ColourWipe.cpp
-		Animation.cpp
-		BlinkAnim.cpp
+		AnimationHelper.cpp
+		Blinking.cpp
 		Chasing.cpp
+		Cycling.cpp
 		)
 
 target_link_libraries(${PROJECT}

@@ -5,7 +5,7 @@
 namespace Lights
 {
 	// Collection of miscellaneous functions used by the animation classes
-	class Animation
+	class AnimationHelper
 	{
 	public:
 		static uint8_t RandomColourWheelIndex(uint8_t seed);

@@ -30,9 +30,9 @@ namespace Lights
 	{
 		if (segment->StepCount() % segment->NumLeds() == 0)
 		{ // aux_param will store our random color wheel index
-			segment->SetAuxParam(Animation::RandomColourWheelIndex(segment->AuxParam()));
+			segment->SetAuxParam(AnimationHelper::RandomColourWheelIndex(segment->AuxParam()));
 		}
-		Colour color = Animation::ColourWheel(segment->AuxParam());
+		Colour color = AnimationHelper::ColourWheel(segment->AuxParam());
 		return Wipe(segment, color, color, false) * 2;
 	}
 
@@ -43,9 +43,9 @@ namespace Lights
 	{
 		if (segment->StepCount() % segment->NumLeds() == 0)
 		{ // aux_param will store our random color wheel index
-			segment->SetAuxParam(Animation::RandomColourWheelIndex(segment->AuxParam()));
+			segment->SetAuxParam(AnimationHelper::RandomColourWheelIndex(segment->AuxParam()));
 		}
-		Colour color = Animation::ColourWheel(segment->AuxParam());
+		Colour color = AnimationHelper::ColourWheel(segment->AuxParam());
 		return Wipe(segment, color, color, true) * 2;
 	}
 

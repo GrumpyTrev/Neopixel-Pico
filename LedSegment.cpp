@@ -13,34 +13,12 @@ namespace Lights
 		}
 	}
 
-	Colour LedSegment::PixelColour(uint index)
-	{
-		return targetStrip->PixelColour(index + startIndex);
-	}
-
-	void LedSegment::SetPixelColour(uint index, Colour colour)
-	{
-		targetStrip->SetPixelColour(index + startIndex, colour);
-	}
-
-	void LedSegment::Show()
-	{
-		targetStrip->Show();
-	}
-
-	uint LedSegment::NumLeds()
-	{
-		return numLeds;
-	}
-
 	void LedSegment::SetAnimation(animationType animationFunction)
 	{
+		animationStepCount = 0;
+		animationCallCount = 0;
+		auxParam = 0;
 		animation = animationFunction;
-	}
-
-	bool LedSegment::IsAnimated()
-	{
-		return (animation != nullptr);
 	}
 
 	void LedSegment::Animate()
@@ -65,16 +43,6 @@ namespace Lights
 		}
 	}
 
-	void LedSegment::Fill(Colour colour)
-	{
-		Fill(colour, 0, numLeds);
-	}
-
-	absolute_time_t LedSegment::NextTime()
-	{
-		return nextTime;
-	}
-
 	Colour LedSegment::GetColour(uint8_t index)
 	{
 		Colour indexedColour;
@@ -92,45 +60,5 @@ namespace Lights
 		{
 			colours[index] = coloursToSet[index];
 		}
-	}
-
-	uint LedSegment::StepCount()
-	{
-		return animationStepCount;
-	}
-
-	void LedSegment::SetStepCount(uint stepCount)
-	{
-		animationStepCount = stepCount;
-	}
-
-	uint LedSegment::Speed()
-	{
-		return animationSpeed;
-	}
-
-	void LedSegment::SetSpeed(uint speed)
-	{
-		animationSpeed = speed;
-	}
-
-	uint8_t LedSegment::AuxParam()
-	{
-		return auxParam;
-	}
-
-	void LedSegment::SetAuxParam(uint8_t param)
-	{
-		auxParam = param;
-	}
-
-	uint LedSegment::CallCount()
-	{
-		return animationCallCount;
-	}
-
-	void LedSegment::SetCallCount(uint callCount)
-	{
-		animationCallCount = callCount;
 	}
 }

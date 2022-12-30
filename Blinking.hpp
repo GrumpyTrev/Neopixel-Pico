@@ -5,7 +5,7 @@
 namespace Lights
 {
 	// Blinking and strobing animations
-	class BlinkAnim
+	class Blinking
 	{
 	public:
 		static uint Blink(LedSegment *segment);

@@ -9,10 +9,8 @@ namespace Lights
 	/// @param stateMachine
 	/// @param dataPin
 	/// @param numLeds
-	/// @param bitsPerPixel
-	ws2812Strip::ws2812Strip(PIO pioBlock, uint stateMachine, uint dataPin, uint numLeds, uint bitsPerPixel)
-		: LedStrip(numLeds), pioBlock(pioBlock), stateMachine(stateMachine), dataPin(dataPin),
-		  bitsPerPixel(bitsPerPixel)
+	ws2812Strip::ws2812Strip(PIO pioBlock, uint stateMachine, uint dataPin, uint numLeds)
+		: LedStrip(numLeds), pioBlock(pioBlock), stateMachine(stateMachine), dataPin(dataPin)
 	{
 		InitialiseStrip();
 	}
@@ -21,9 +19,7 @@ namespace Lights
 	///	Find an available PIO/state machine pair and initialise the PIO
 	/// @param dataPin
 	/// @param numLeds
-	/// @param bitsPerPixel
-	ws2812Strip::ws2812Strip(uint dataPin, uint numLeds, uint bitsPerPixel)
-		: LedStrip(numLeds), dataPin(dataPin), bitsPerPixel(bitsPerPixel)
+	ws2812Strip::ws2812Strip(uint dataPin, uint numLeds) : LedStrip(numLeds), dataPin(dataPin)
 	{
 		// Try getting an unused SM from first PIO 0 and then PIO 1
 		pioBlock = pio0;
@@ -43,7 +39,7 @@ namespace Lights
 	{
 		uint offset = pio_add_program(pioBlock, &ws2812_program);
 
-		ws2812_program_init(pioBlock, stateMachine, offset, dataPin, 800000, bitsPerPixel);
+		ws2812_program_init(pioBlock, stateMachine, offset, dataPin, Frequency, BitsPerPixel);
 
 		// Always allow the first write
 		nextWriteAllowedTime = get_absolute_time();
@@ -64,16 +60,8 @@ namespace Lights
 		// Can write now.
 		for (uint i = 0; i < numLeds; i++)
 		{
-			if (bitsPerPixel == 24)
-			{
-				pio_sm_put_blocking(pioBlock, stateMachine,
-									ScalePixelData(pixelData[i].value, brightness) << 8);
-			}
-			else
-			{
-				pio_sm_put_blocking(pioBlock, stateMachine,
-									ScalePixelData(pixelData[i].value, brightness));
-			}
+			pio_sm_put_blocking(pioBlock, stateMachine,
+								ScalePixelData(pixelData[i].value, brightness) << 8);
 		}
 
 		// Update the next time that a write is allowed

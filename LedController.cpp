@@ -46,19 +46,4 @@ namespace Lights
 			targetStrip->Show();
 		}
 	}
-
-	void LedController::SetAnimation(LedSegment::animationType animationFunction)
-	{
-		firstSegment->SetAnimation(animationFunction);
-	}
-
-	void LedController::SetSpeed(uint speed)
-	{
-		firstSegment->SetSpeed(speed);
-	}
-
-	void LedController::SetColours(std::vector<Colour> colours)
-	{
-		firstSegment->SetColours(colours);
-	}
 }

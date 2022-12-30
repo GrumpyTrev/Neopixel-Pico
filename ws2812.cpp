@@ -12,8 +12,9 @@
 #include "ws2812Strip.hpp"
 #include "LedController.hpp"
 #include "ColourWipe.hpp"
-#include "BlinkAnim.hpp"
+#include "Blinking.hpp"
 #include "Chasing.hpp"
+#include "Cycling.hpp"
 
 using namespace Lights;
 
@@ -22,12 +23,12 @@ using namespace Lights;
 #define WS2812_PIN 10
 #define OUTPUT_ENABLE_PIN 11
 
-const Colour black = Colour::RGB(0, 0, 0);
-const Colour red = Colour::RGB(0xff, 0, 0);
-const Colour green = Colour::RGB(0, 0xff, 0);
-const Colour blue = Colour::RGB(0, 0, 0xff);
-const Colour white = Colour::RGB(0xff, 0xff, 0xff);
-const Colour warmFluorescent = Colour::FromInt(0xFFF4E5); /* 0 K, 255, 244, 229 */
+const Colour black = Colour(0, 0, 0);
+const Colour red = Colour(0xff, 0, 0);
+const Colour green = Colour(0, 0xff, 0);
+const Colour blue = Colour(0, 0, 0xff);
+const Colour white = Colour(0xff, 0xff, 0xff);
+const Colour warmFluorescent = Colour(0xFFF4E5); /* 0 K, 255, 244, 229 */
 
 int pixelQueue = 0;
 uint8_t colourCycle = 0;
@@ -54,7 +55,7 @@ void pattern_random(LedSegment *seg, uint t)
 	if (t % 8)
 		return;
 	for (int i = 0; i < seg->NumLeds(); ++i)
-		seg->SetPixelColour(i, Colour::FromInt(rand()));
+		seg->SetPixelColour(i, Colour(rand()));
 	seg->Show();
 }
 
@@ -63,7 +64,7 @@ void pattern_sparkle(LedSegment *seg, uint t)
 	if (t % 8)
 		return;
 	for (int i = 0; i < seg->NumLeds(); ++i)
-		seg->SetPixelColour(i, Colour::FromInt(rand() % 16 ? 0 : 0xffffff));
+		seg->SetPixelColour(i, Colour(rand() % 16 ? 0 : 0xffffff));
 	seg->Show();
 }
 
@@ -73,7 +74,7 @@ void pattern_greys(LedSegment *seg, uint t)
 	t %= max;
 	for (int i = 0; i < seg->NumLeds(); ++i)
 	{
-		seg->SetPixelColour(i, Colour::FromInt(t * 0x10101));
+		seg->SetPixelColour(i, Colour(t * 0x10101));
 		if (++t >= max)
 			t = 0;
 	}
@@ -87,15 +88,15 @@ Colour Wheel(uint8_t WheelPos)
 	WheelPos = 255 - WheelPos;
 	if (WheelPos < 85)
 	{
-		return Colour::RGB(255 - WheelPos * 3, 0, WheelPos * 3);
+		return Colour(255 - WheelPos * 3, 0, WheelPos * 3);
 	}
 	if (WheelPos < 170)
 	{
 		WheelPos -= 85;
-		return Colour::RGB(0, WheelPos * 3, 255 - WheelPos * 3);
+		return Colour(0, WheelPos * 3, 255 - WheelPos * 3);
 	}
 	WheelPos -= 170;
-	return Colour::RGB(WheelPos * 3, 255 - WheelPos * 3, 0);
+	return Colour(WheelPos * 3, 255 - WheelPos * 3, 0);
 }
 
 // Theater-marquee-style chasing lights. Pass in a color (32-bit value,
@@ -124,30 +125,8 @@ void theaterChase(LedSegment *seg, uint t)
 	colourCycle++;
 }
 
-Lights::ws2812Strip leds(WS2812_PIN, NUM_PIXELS, 24);
-void clear()
-{
-	leds.Fill(black);
-}
-
-void write()
-{
-	leds.Show();
-}
-
-void fillTest(Colour colour)
-{
-	clear();
-	leds.SetPixelColour(0, colour);
-	write();
-
-	for (int index = 1; index < NUM_PIXELS; index++)
-	{
-		leds.SetPixelColour(index - 1, black);
-		leds.SetPixelColour(index, colour);
-		write();
-	}
-}
+Lights::ws2812Strip leds(WS2812_PIN, NUM_PIXELS);
+LedController controller(&leds);
 
 typedef void (*pattern)(LedSegment *seg, uint t);
 const struct
@@ -164,74 +143,167 @@ const struct
 };
 
 typedef uint (*animation)(LedSegment *seg);
-const struct
+struct
 {
 	animation pat;
+	const char *name;
+	int speedIndex;
 } animationTable[] = {
-	{ColourWipe::WipeReverse},
-	{ColourWipe::SweepRandom},
-	{BlinkAnim::BlinkRandomRainbow},
-	{Chasing::TheatreChaseRainbow},
-	{Chasing::TricolourChase}};
+	/*	{ColourWipe::Wipe, "Wipe", 4},
+		{ColourWipe::WipeInverse, "Wipe Inverse", 4},
+		{ColourWipe::WipeReverse, "Wipe Reverse", 3},
+		{ColourWipe::WipeReverseInverse, "Wipe Reverse Inverse", 3},
+		{ColourWipe::WipeRandom, "Wipe Random", 3},
+		{ColourWipe::SweepRandom, "Sweep Random", 3},
+		{Blinking::Blink, "Blink", 4},
+		{Blinking::BlinkRainbow, "Blink Rainbow", 4},
+		{Blinking::BlinkRandomRainbow, "Blink Random Rainbow", 4},
+		{Blinking::Stobe, "Strobe", 4},
+		{Blinking::StobeRainbow, "Strobe Rainbow", 3},
+		{Chasing::TricolourChase, "Tricolour Chase", 2},
+		{Chasing::TheatreChase, "Theatre Chase", 2},
+		{Chasing::TheatreChaseRainbow, "Theatre Chase Rainbow", 2},
+		*/
+	{Cycling::CycleRainbow, "Cycle Rainbow", 0}};
+
+#define NO_COMMAND 0
+#define NEXT_ANIMATION 1
+#define TOGGLE_CYCLE 2
+#define SPEED 3
+#define TOGGLE_GAMMA 4
+
+int command = NO_COMMAND;
+const struct
+{
+	int speed;
+	const char *name;
+} speeds[] = {{100, "X fast 100"}, {250, "Very fast 250"}, {500, "Fast 500"}, {1000, "Normal 1000"}, {2000, "Slow 2000"}};
+
+absolute_time_t runUntil;
+int animationIndex = 0;
+bool cycling = true;
+
+void GetCommand()
+{
+	int input;
+	do
+	{
+		input = getchar_timeout_us(0);
+		if (input != PICO_ERROR_TIMEOUT)
+		{
+			putchar(input);
+			if ((input == 'N') || (input == 'n'))
+			{
+				command = NEXT_ANIMATION;
+			}
+			else if ((input == 'C') || (input == 'c'))
+			{
+				command = TOGGLE_CYCLE;
+			}
+			else if ((input == 'S') || (input == 's'))
+			{
+				command = SPEED;
+			}
+			else if ((input == 'G') || (input == 'g'))
+			{
+				command = TOGGLE_GAMMA;
+			}
+		}
+	} while (input != PICO_ERROR_TIMEOUT);
+}
+
+void SetAnimation(int index)
+{
+	controller.SetAnimation(animationTable[index].pat);
+	controller.SetSpeed(speeds[animationTable[index].speedIndex].speed);
+
+	printf("%s Speed %s\n", animationTable[index].name,
+		   speeds[animationTable[index].speedIndex].name);
+
+	if (cycling == true)
+	{
+		// Let each pattern run for 20 seconds
+		runUntil = delayed_by_ms(get_absolute_time(), 20000);
+	}
+}
+
+void NextAnimation()
+{
+	if (++animationIndex >= count_of(animationTable))
+	{
+		animationIndex = 0;
+	}
+	SetAnimation(animationIndex);
+}
+
+bool TimeReached()
+{
+	return (cycling == true) && (time_reached(runUntil) == true);
+}
 
 int main()
 {
 	stdio_init_all();
-	printf("WS2812 Smoke Test, using pin %d", WS2812_PIN);
 
 	// Enable the level shifter output
 	gpio_init(OUTPUT_ENABLE_PIN);
 	gpio_set_dir(OUTPUT_ENABLE_PIN, GPIO_OUT);
 	gpio_put(OUTPUT_ENABLE_PIN, 0);
 
-	int t = 0;
-	Colour testColour1 = Colour::RGB(0x7f, 0, 0);
-	Colour testColour2 = Colour::RGB(0, 0x7f, 0);
-	Colour testColour = testColour1;
+	leds.SetBrightness(50);
+	leds.ApplyGamma(true);
+	printf("Speed %d Brightness %d\n", controller.Speed(), leds.Brightness());
 
-	leds.SetBrightness(0x7f);
-
-	LedSegment segmentStart(&leds, 0, NUM_PIXELS / 2);
-	LedSegment segmentEnd(&leds, NUM_PIXELS / 2, NUM_PIXELS / 2);
-
-	LedController controller(&leds);
-	controller.SetSpeed(500);
-	//	controller.SetAnimation(ColourWipe::WipeReverse);
-	//  controller.SetAnimation(ColourWipe::SweepRandom);
-	//	controller.SetAnimation(BlinkAnim::BlinkRandomRainbow);
-	//  controller.SetAnimation(Chasing::TheatreChaseRainbow);
-	//  controller.SetAnimation(Chasing::TricolourChase);
 	//	controller.SetColours({blue, warmFluorescent});
 	controller.SetColours({red, warmFluorescent, black});
+	SetAnimation(animationIndex);
+
+	controller.SetSpeed(20);
+	cycling = false;
 
 	while (1)
 	{
-		int animation = rand() % count_of(animationTable);
-		controller.SetAnimation(animationTable[animation].pat);
-
-		// Let each pattern run for 20 seconds
-		absolute_time_t runUntil = delayed_by_ms(get_absolute_time(), 20000);
-		while (time_reached(runUntil) == false)
-		//	while (true)
+		while ((TimeReached() == false) && (command == NO_COMMAND))
 		{
-			//		pattern_table[pat].pat(&segmentStart, t);
-			//		pattern_table[pat].pat(&segmentEnd, t);
-			//		sleep_ms(pattern_table[pat].delay);
-			//		t += dir;
 			controller.Animate();
+			GetCommand();
 		}
 
-		/*
-				fillTest(testColour);
+		if (command != NO_COMMAND)
+		{
+			if (command == NEXT_ANIMATION)
+			{
+				cycling = false;
+				NextAnimation();
+			}
+			else if (command == TOGGLE_CYCLE)
+			{
+				cycling = !cycling;
+				printf("Cycling %s \n", cycling ? "True" : "False");
+			}
+			else if (command == SPEED)
+			{
+				int speedIndex = animationTable[animationIndex].speedIndex;
 
-				if (testColour.value == testColour1.value)
+				if (++speedIndex >= count_of(speeds))
 				{
-					testColour = testColour2;
+					speedIndex = 0;
 				}
-				else
-				{
-					testColour = testColour1;
-				}
-		*/
+				animationTable[animationIndex].speedIndex = speedIndex;
+				controller.SetSpeed(speeds[speedIndex].speed);
+				printf("Speed %s\n", speeds[speedIndex].name);
+			}
+			else if (command == TOGGLE_GAMMA)
+			{
+				leds.ApplyGamma(!leds.Gamma());
+				printf("Gamma %s \n", leds.Gamma() ? "True" : "False");
+			}
+
+			command = NO_COMMAND;
+		}
+		else if (cycling == true)
+		{
+			NextAnimation();
+		}
 	}
 }
