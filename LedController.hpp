@@ -14,9 +14,13 @@ namespace Lights
 	public:
 		LedController(LedStrip *target);
 		void Animate();
-		void SetAnimation(LedSegment::animationType animationFunction);
-		void SetSpeed(uint speed);
-		void SetColours(std::vector<Colour> colours);
+		inline void SetAnimation(LedSegment::animationType animationFunction)
+		{
+			firstSegment->SetAnimation(animationFunction);
+		};
+		inline void SetSpeed(uint speed) { firstSegment->SetSpeed(speed); };
+		inline void SetColours(std::vector<Colour> colours) { firstSegment->SetColours(colours); };
+		inline uint Speed() { return firstSegment->Speed(); };
 
 	private:
 		LedStrip *targetStrip;
@@ -26,4 +30,4 @@ namespace Lights
 		LedSegment *defaultSegment;
 		LedSegment *firstSegment;
 	};
-} // namespace Lights
+}
