@@ -19,11 +19,14 @@ add_executable(${PROJECT}
 		ws2812Strip.cpp 
 		LedSegment.cpp
 		LedController.cpp
-		ColourWipe.cpp
+		Wiping.cpp
 		AnimationHelper.cpp
 		Blinking.cpp
 		Chasing.cpp
 		Cycling.cpp
+		Animator.cpp
+		Commander.cpp
+		Twinkling.cpp
 		)
 
 target_link_libraries(${PROJECT}

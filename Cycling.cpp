@@ -2,31 +2,40 @@
 
 namespace Lights
 {
+	/// @brief Cycle through the entire HSV colour space lighting the LEDs per call.
+	/// @param segment
+	/// @return
 	uint Cycling::CycleRainbow(LedSegment *segment)
 	{
-		// strip.rainbow() can take a single argument (first pixel hue) or
-		// optionally a few extras: number of rainbow repetitions (default 1),
-		// saturation and value (brightness) (both 0-255, similar to the
-		// ColorHSV() function, default 255), and a true/false flag for whether
-		// to apply gamma correction to provide 'truer' colors (default true).
+		// Use a saved starting point fo the colour cycle.
 		uint16_t firstPixelHue = segment->StepCount();
 		Rainbow(segment, firstPixelHue, 1, 255, 255);
 
-		// This will wrap at 65626
-		firstPixelHue += 256;
+		// Change the starting point of the colour cycle for next time
+		firstPixelHue += (segment->Options() == 0) ? 256 : segment->Options();
 
 		segment->SetStepCount(firstPixelHue);
 
 		return segment->Speed();
 	}
 
+	/// @brief Light the LEDs with colours from the HSV colour space. Each LED will be lit with a
+	/// different colour from the space and the entire HSV space will sampled 'reps' times
+	/// @param segment
+	/// @param first_hue The starting point for getting colours from the HSV space. By changing this in
+	/// each call a moving rainbow effect can be produced
+	/// @param reps The number of time the entire HSV colour space is shown per string of LEDs
+	/// @param saturation
+	/// @param brightness
 	void Cycling::Rainbow(LedSegment *segment, uint16_t first_hue, int8_t reps,
 						  uint8_t saturation, uint8_t brightness)
 	{
-		for (uint16_t i = 0; i < segment->NumLeds(); i++)
+		uint numLeds = segment->NumLeds();
+
+		for (uint index = 0; index < numLeds; index++)
 		{
-			uint16_t hue = first_hue + (i * reps * 65536) / segment->NumLeds();
-			segment->SetPixelColour(i, Colour::ColourHSV(hue, saturation, brightness));
+			uint16_t hue = first_hue + (index * reps * 65536) / numLeds;
+			segment->SetPixelColour(index, Colour::ColourHSV(hue, saturation, brightness));
 		}
 	}
 }

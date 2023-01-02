@@ -13,19 +13,23 @@ namespace Lights
 	{
 	public:
 		LedController(LedStrip *target);
-		void Animate();
+		int AddSegment(LedSegment *segment);
 		inline void SetAnimation(LedSegment::animationType animationFunction)
 		{
 			firstSegment->SetAnimation(animationFunction);
 		};
+		void SetAnimation(uint index, LedSegment::animationType animationFunction);
+		void Animate();
 		inline void SetSpeed(uint speed) { firstSegment->SetSpeed(speed); };
 		inline void SetColours(std::vector<Colour> colours) { firstSegment->SetColours(colours); };
 		inline uint Speed() { return firstSegment->Speed(); };
+		inline void ToggleGamma() { targetStrip->ApplyGamma(!targetStrip->Gamma()); };
+		inline bool Gamma() { return targetStrip->Gamma(); };
+		inline void SetOptions(uint8_t value) { firstSegment->SetOptions(value); }
 
 	private:
 		LedStrip *targetStrip;
 
-		static const uint MaximumNumberOfSegments = 10;
 		std::vector<LedSegment *> userSegments;
 		LedSegment *defaultSegment;
 		LedSegment *firstSegment;

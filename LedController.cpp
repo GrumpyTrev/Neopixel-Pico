@@ -10,6 +10,30 @@ namespace Lights
 		firstSegment = defaultSegment;
 	}
 
+	/// Add a new LedSegment to the collection. If this is the first user segement then make it the
+	/// segment
+	int LedController::AddSegment(LedSegment *segment)
+	{
+		userSegments.push_back(segment);
+		if (userSegments.size() == 1)
+		{
+			firstSegment = segment;
+		}
+
+		return userSegments.size();
+	}
+
+	/// @brief Set the animation type for the specified segment
+	/// @param index
+	/// @param animationFunction
+	void LedController::SetAnimation(uint index, LedSegment::animationType animationFunction)
+	{
+		if (index < userSegments.size())
+		{
+			userSegments[index]->SetAnimation(animationFunction);
+		}
+	}
+
 	/// @brief Iterate through the collecton of LedSegment and aniamate any of those that are
 	/// ready to run.
 	void LedController::Animate()

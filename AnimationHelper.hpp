@@ -11,6 +11,14 @@ namespace Lights
 		static uint8_t RandomColourWheelIndex(uint8_t seed);
 		static Colour ColourWheel(uint8_t pos);
 		static uint8_t Random8();
+		static uint8_t Random8(uint8_t lim);
+		static uint8_t Random8(uint8_t min, uint8_t lim);
+		static uint16_t Random16();
+		static void Random16AddEntropy(uint16_t entropy);
+		static uint8_t QAdd8(uint8_t i, uint8_t j);
+		static uint8_t QSub8(uint8_t i, uint8_t j);
+		static Colour HeatColor(uint8_t temperature);
+		static uint8_t Scale8Video(uint8_t i, uint8_t scale);
 
 	private:
 		// 16 bit random number seed

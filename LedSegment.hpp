@@ -27,7 +27,7 @@ namespace Lights
 		inline void Show() { targetStrip->Show(); };
 		void Animate();
 		void Fill(Colour colour, uint first, uint count);
-		void Fill(Colour colour) { Fill(colour, 0, numLeds); };
+		inline void Fill(Colour colour) { Fill(colour, 0, numLeds); };
 		Colour GetColour(uint8_t index);
 		void SetColours(std::vector<Colour> colours);
 		void SetAnimation(animationType animationFunction);
@@ -43,6 +43,8 @@ namespace Lights
 		inline void SetAuxParam(uint8_t param) { auxParam = param; };
 		inline uint CallCount() { return animationCallCount; };
 		inline void SetCallCount(uint callCount) { animationCallCount = callCount; };
+		inline uint8_t Options() { return options; };
+		inline void SetOptions(uint8_t value) { options = value; };
 
 	private:
 		LedStrip *targetStrip;
@@ -65,8 +67,11 @@ namespace Lights
 		// For most it is how long a complete animation cycle should take
 		uint animationSpeed = 1000;
 
-		// Auxillary animation parameter
+		// Auxillary animation parameter typically used as a counter
 		uint8_t auxParam = 0;
+
+		// Options parameter, animation specific
+		uint8_t options = 0;
 
 		// A counter incremented every time this animation is called
 		uint animationCallCount = 0;

@@ -9,7 +9,7 @@ namespace Lights
 	};
 
 	// Blinking half on/off between a colour from the Wheel and Colour(1)
-	// The animation CallCount is used to step along the wheel
+	// The animation CallCount*4 is used to step along the wheel
 	uint Blinking::BlinkRainbow(LedSegment *segment)
 	{
 		return Blink(segment, AnimationHelper::ColourWheel(segment->CallCount() << 2),
@@ -41,7 +41,6 @@ namespace Lights
 
 	// Swap between two colours using the CallCount to select the colour
 	// The duration of each colour depends on whether or not stobing is on
-	// TODO alolw the stobe duration to be controlled
 	uint Blinking::Blink(LedSegment *segment, Colour colour1, Colour colour2, bool strobe)
 	{
 		uint delay = 0;
@@ -49,12 +48,12 @@ namespace Lights
 		if (segment->CallCount() & 1)
 		{
 			segment->Fill(colour2);
-			delay = strobe ? segment->Speed() - 50 : (segment->Speed() / 2);
+			delay = strobe ? segment->Speed() - segment->Options() : (segment->Speed() / 2);
 		}
 		else
 		{
 			segment->Fill(colour1);
-			delay = strobe ? 50 : (segment->Speed() / 2);
+			delay = strobe ? segment->Options() : (segment->Speed() / 2);
 		}
 
 		return delay;
