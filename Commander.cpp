@@ -58,6 +58,10 @@ namespace Lights
 				{
 					command = SET_OPTION;
 				}
+				else if ((input == 'B') || (input == 'b'))
+				{
+					command = SET_BRIGHTNESS;
+				}
 			}
 		} while (input != PICO_ERROR_TIMEOUT);
 	}
@@ -116,6 +120,13 @@ namespace Lights
 				if (numberEntered != -1)
 				{
 					animationTarget->SetOptions(numberEntered);
+				}
+			}
+			else if (command == SET_BRIGHTNESS)
+			{
+				if (numberEntered != -1)
+				{
+					animationTarget->SetBrightness(numberEntered);
 				}
 			}
 

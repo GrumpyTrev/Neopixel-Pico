@@ -19,6 +19,7 @@ namespace Lights
 #define TOGGLE_GAMMA 5
 #define EXIT_ANIMATION 6
 #define SET_OPTION 7
+#define SET_BRIGHTNESS 8
 
 		// The single letter command that has been entered
 		int command = NO_COMMAND;

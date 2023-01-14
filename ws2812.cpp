@@ -11,6 +11,7 @@
 #include "Cycling.hpp"
 #include "Animator.hpp"
 #include "Twinkling.hpp"
+#include "Fading.hpp"
 
 using namespace Lights;
 
@@ -100,12 +101,25 @@ int main()
 
 	LedController testController(&leds);
 	Animator testAnimator(&testController);
-	testAnimator.SetAnimations({{Twinkling::Twinkle, "Twinkle", 1000, 0}});
+	testAnimator.SetAnimations({{Twinkling::Twinkle, "Twinkle", 1000, 204}});
+
+	LedController testController2(&leds);
+	Animator testAnimator2(&testController2);
+	testAnimator2.SetAnimations({{Fading::Fade, "Fade", 1000, 4}});
+	testController2.SetColours({red, magentaPink});
+
+	LedController testController3(&leds);
+	Animator testAnimator3(&testController3);
+	testAnimator3.SetAnimations({{Fading::FadeRainbow, "Fade rainbow", 2000, 1}});
+	testController3.SetColours({black});
+	leds.SetBrightness(64);
 
 	while (1)
 	{
 		//		cyclingAnimator.Animate();
 		//		segmentAnimator.Animate();
-		testAnimator.Animate();
+		//		testAnimator.Animate();
+		//		testAnimator2.Animate();
+		testAnimator3.Animate();
 	}
 }

@@ -45,6 +45,7 @@ namespace Lights
 		inline void SetCallCount(uint callCount) { animationCallCount = callCount; };
 		inline uint8_t Options() { return options; };
 		inline void SetOptions(uint8_t value) { options = value; };
+		inline void SetBrightness(uint8_t brightness) { targetStrip->SetBrightness(brightness); };
 
 	private:
 		LedStrip *targetStrip;

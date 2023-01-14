@@ -26,6 +26,7 @@ namespace Lights
 		inline void ToggleGamma() { targetStrip->ApplyGamma(!targetStrip->Gamma()); };
 		inline bool Gamma() { return targetStrip->Gamma(); };
 		inline void SetOptions(uint8_t value) { firstSegment->SetOptions(value); }
+		inline void SetBrightness(uint8_t brightness) { firstSegment->SetBrightness(brightness); };
 
 	private:
 		LedStrip *targetStrip;

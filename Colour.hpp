@@ -35,10 +35,12 @@ namespace Lights
 
 		static Colour ColourHSV(uint16_t hue, uint8_t sat, uint8_t val);
 
-		static uint8_t Gamma8(uint8_t x) { return GammaTable[x]; }
+		static inline uint8_t Gamma8(uint8_t x) { return GammaTable[x]; }
 
 		static uint32_t Gamma32(uint32_t rgbValue);
 
 		static const uint8_t GammaTable[256];
+
+		static Colour Blend(Colour source, Colour destination, uint8_t amount);
 	};
 }

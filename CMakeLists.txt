@@ -27,6 +27,7 @@ add_executable(${PROJECT}
 		Animator.cpp
 		Commander.cpp
 		Twinkling.cpp
+		Fading.cpp
 		)
 
 target_link_libraries(${PROJECT}

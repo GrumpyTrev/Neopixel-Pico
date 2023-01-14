@@ -127,6 +127,36 @@ namespace Lights
 		return rgbValue;
 	}
 
+	/// @brief Blend two colours together
+	/// @param source
+	/// @param destination
+	/// @param amount How much of the destination colour is in the blend ( 0 - none, 255 -all )
+	/// @return
+	Colour Colour::Blend(Colour source, Colour destination, uint8_t amount)
+	{
+		Colour blendedColour;
+
+		if (amount == 0)
+		{
+			blendedColour = source;
+		}
+		else if (amount == 255)
+		{
+			blendedColour = destination;
+		}
+		else
+		{
+			blendedColour.component.red = amount * (destination.component.red - source.component.red) / 256 +
+										  source.component.red;
+			blendedColour.component.green = amount * (destination.component.green - source.component.green) / 256 +
+											source.component.green;
+			blendedColour.component.blue = amount * (destination.component.blue - source.component.blue) / 256 +
+										   source.component.blue;
+		}
+
+		return blendedColour;
+	}
+
 	const uint8_t constexpr Colour::GammaTable[256] = {
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1,

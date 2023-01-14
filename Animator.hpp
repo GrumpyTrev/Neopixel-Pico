@@ -34,6 +34,7 @@ namespace Lights
 		inline void SetCycle(bool value) { cycling = value; };
 		inline void ExitAnimation() { exitAnimation = true; };
 		void SetOptions(uint8_t options);
+		void SetBrightness(uint8_t brightness);
 
 	private:
 		/// @brief When cycling is enabled each animation is only allowed a certain time to run

@@ -81,6 +81,12 @@ namespace Lights
 		printf("Options %d\n", options);
 	};
 
+	void Animator::SetBrightness(uint8_t brightness)
+	{
+		controller->SetBrightness(brightness);
+		printf("Brightness %d\n", brightness);
+	};
+
 	void Animator::Animate()
 	{
 		// Commander used to let the user interact

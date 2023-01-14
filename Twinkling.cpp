@@ -41,25 +41,29 @@ namespace Lights
 		}
 
 		// Check if a sparkle is required
-		if (segment->CallCount() % 300 == 0)
+		if (segment->CallCount() % 30 == 0)
 		{
 			seeds = AnimationHelper::Random8(numLeds - 20, numLeds);
 
 			for (int i = 0; i < seeds; i++)
 			{
-				{
-					int pos = AnimationHelper::Random8(numLeds);
-					AnimationHelper::Random16AddEntropy(rand());
-					heat[pos] = AnimationHelper::Random8(127, 255);
-				}
+				int pos = AnimationHelper::Random8(numLeds);
+				AnimationHelper::Random16AddEntropy(rand());
+				heat[pos] = AnimationHelper::Random8(127, 255);
 			}
 		}
 
 		// Step 5. Map from heat cells to LED colors
 		for (int j = 0; j < numLeds; j++)
 		{
-			segment->SetPixelColour(j, AnimationHelper::HeatColor(heat[j]));
-			//			segment->SetPixelColour(j, Colour::ColourHSV(9000, 204, heat[j]));
+			if (segment->Options() % 2 == 0)
+			{
+				segment->SetPixelColour(j, AnimationHelper::HeatColor(heat[j]));
+			}
+			else
+			{
+				segment->SetPixelColour(j, Colour::ColourHSV(9000, segment->Options(), heat[j]));
+			}
 		}
 
 		return segment->Speed() / 30; // assign the next time Twinkle() should happen
