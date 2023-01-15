@@ -12,6 +12,7 @@
 #include "Animator.hpp"
 #include "Twinkling.hpp"
 #include "Fading.hpp"
+#include "Scanning.hpp"
 
 using namespace Lights;
 
@@ -59,7 +60,7 @@ int main()
 	gpio_put(OUTPUT_ENABLE_PIN, 0);
 
 	Lights::ws2812Strip leds(WS2812_PIN, NUM_PIXELS);
-	leds.SetBrightness(25);
+	leds.SetBrightness(32);
 	leds.ApplyGamma(true);
 
 	printf("Gamma %d Brightness %d\n", leds.Gamma(), leds.Brightness());
@@ -112,7 +113,15 @@ int main()
 	Animator testAnimator3(&testController3);
 	testAnimator3.SetAnimations({{Fading::FadeRainbow, "Fade rainbow", 2000, 1}});
 	testController3.SetColours({black});
-	leds.SetBrightness(64);
+
+	LedController testController4(&leds);
+	Animator testAnimator4(&testController4);
+	testAnimator4.SetAnimations({{Scanning::ScanFull, "Scan full", 3000, 5},
+								 {Scanning::ScanRandom, "Scan random", 3000, 5},
+								 {Scanning::ScanDualRandom, "Scan dual random", 3000, 3},
+								 {Scanning::ScanDualFull, "Scan dual full", 3000, 3}});
+	testController4.SetColours({rubyRed, black});
+	testAnimator4.SetCycling(true);
 
 	while (1)
 	{
@@ -120,6 +129,7 @@ int main()
 		//		segmentAnimator.Animate();
 		//		testAnimator.Animate();
 		//		testAnimator2.Animate();
-		testAnimator3.Animate();
+		//		testAnimator3.Animate();
+		testAnimator4.Animate();
 	}
 }
